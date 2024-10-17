@@ -23,6 +23,6 @@ else:
     axs[1].axis('off')
 
     plt.show()
-    output_path = '../images/image_end/work_2_end.jpg'
+    output_path = r'../images/image_end/work_2_end.jpg'
     cv2.imwrite(output_path, equalized_image)
-    print(f"Equalized image saved to '{output_path}'")
+    print(f"image saved to '{output_path}'")
