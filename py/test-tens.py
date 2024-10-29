@@ -1,5 +1,6 @@
 import tensorflow as tf
 import os
+
 tf.config.set_visible_devices([], 'GPU')
 print(tf.__version__)
 print(tf.sysconfig.get_build_info()["cudnn_version"])
