@@ -34,7 +34,7 @@ green_area_cm2 = green_pixels * (pixel_to_cm_ratio ** 2)
 
 print(f"绿色植物部分的估算面积为: {green_area_cm2:.2f} 平方厘米")
 
-# # 显示绿色提取效果（可选）
+# # 显示绿色提取效果
 # cv2.imshow("Green Mask", green_mask)
 # cv2.waitKey(0)
 # cv2.destroyAllWindows()
