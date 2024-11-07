@@ -1,0 +1,10 @@
+^E:\DL_CLASS\EXAM_LRX\CPP\BUILD\CMAKEFILES\C86886E30F45E7CE04F7F3151EED10D1\GENERATE.STAMP.RULE
+setlocal
+E:\cmake\bin\cmake.exe -SE:/DL_class/exam_LRX/cpp -BE:/DL_class/exam_LRX/cpp/build --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file E:/DL_class/exam_LRX/cpp/build/OpenCV_work.sln
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

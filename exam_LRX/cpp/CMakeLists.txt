@@ -5,24 +5,19 @@ project(OpenCV_work)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-# 设置OpenCV的本地路径
 set(OpenCV_DIR "${CMAKE_SOURCE_DIR}/package/opencv")
+find_package(OpenCV REQUIRED)
 
-# 指定OpenCV头文件的路径
-include_directories(${OpenCV_DIR}/include)
+# 包含 OpenCV 头文件
+include_directories(${OpenCV_INCLUDE_DIRS})
 
-# 指定OpenCV库的路径
-link_directories(${OpenCV_DIR}/lib)
-
-# 显示opencv
+# 显示OpenCV库路径
 message(STATUS "OpenCV library status:")
-message(STATUS "OpenCV Include Directory: ${OpenCV_DIR}/include")
-message(STATUS "OpenCV Library Directory: ${OpenCV_DIR}/lib")
+message(STATUS "OpenCV Directory: ${OpenCV_DIR}")
+message(STATUS "OpenCV Include Directory: ${OpenCV_INCLUDE_DIRS}")
+message(STATUS "OpenCV Library Directory: ${OpenCV_LIBS}")
 
 # 添加可执行文件
 add_executable(work1 work1.cpp)
 
-# 链接所需的OpenCV库
-target_link_libraries(work1 opencv_core opencv_imgcodecs opencv_highgui)
-
-
+target_link_libraries(work1 ${OpenCV_LIBS})
