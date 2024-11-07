@@ -3,9 +3,6 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 
-import sys
-# sys.stdout.buffer.write(some_text.encode('utf-8'))
-
 # 读取图像
 image = cv2.imread('../image/image2.png')
 image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
