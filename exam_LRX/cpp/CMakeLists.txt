@@ -24,6 +24,7 @@ add_executable(work2 work2.cpp)
 add_executable(work3 work3.cpp)
 add_executable(work4 work4.cpp)
 #add_executable(work5 work5.cpp)
+add_executable(work6 work6.cpp)
 
 
 target_link_libraries(work1 ${OpenCV_LIBS})
@@ -31,3 +32,4 @@ target_link_libraries(work2 ${OpenCV_LIBS})
 target_link_libraries(work3 ${OpenCV_LIBS})
 target_link_libraries(work4 ${OpenCV_LIBS})
 #target_link_libraries(work5 ${OpenCV_LIBS})
+target_link_libraries(work6 ${OpenCV_LIBS})
