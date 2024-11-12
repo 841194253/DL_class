@@ -16,7 +16,7 @@ upper_yellow = np.array([30, 255, 255])
 mask_yellow = cv2.inRange(image_hsv, lower_yellow, upper_yellow)
 
 # 对掩膜应用形态学操作以去除噪声
-kernel = np.ones((5, 5), np.uint8)
+kernel = np.ones((3, 3), np.uint8)
 mask_yellow = cv2.morphologyEx(mask_yellow, cv2.MORPH_CLOSE, kernel)
 
 # 计算病变面积占总面积的比例
