@@ -1,6 +1,6 @@
 //
 // Created by liryi on 24-11-6.
-//
+// 1.提取图中的植物部分，并估算植物的绿色部分面积，已知植物生长的槽的宽是20 cm。
 #include <opencv2/opencv.hpp>
 #include <iostream>
 

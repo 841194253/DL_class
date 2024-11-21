@@ -1,3 +1,4 @@
+# 采用直方图均衡方法处理图像A，结果类似图B
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt

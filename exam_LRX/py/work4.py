@@ -1,3 +1,4 @@
+# 4.分割获取谷子的各叶片，即把每个叶片独立分割，并用不同颜色表示
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt

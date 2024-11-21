@@ -1,6 +1,6 @@
 //
 // Created by liryi on 24-11-7.
-//
+//2.提取图像中的叶片病害的图斑数目、估算病害图斑占叶片的总面比例。
 
 #include <opencv2/opencv.hpp>
 #include <iostream>

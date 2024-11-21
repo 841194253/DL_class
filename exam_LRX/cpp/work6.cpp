@@ -1,6 +1,6 @@
 //
 // Created by liryi on 24-11-12.
-//
+//6.采用直方图均衡方法处理图像A，结果类似图B。
 #include <opencv2/opencv.hpp>
 #include <iostream>
 

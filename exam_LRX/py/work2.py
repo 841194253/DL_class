@@ -1,3 +1,4 @@
+# 2.提取图像中的叶片病害的图斑数目、估算病害图斑占叶片的总面比例。
 # -*- coding: utf-8 -*-
 import cv2
 import numpy as np

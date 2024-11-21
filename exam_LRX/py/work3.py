@@ -1,3 +1,4 @@
+# 3.采用图像形态学获取图像中小米的粒数、每粒小米的最大投影面积或者外接最大正方形的长与宽
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt

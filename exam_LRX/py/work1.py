@@ -1,3 +1,4 @@
+# 1.提取图中的植物部分，并估算植物的绿色部分面积，已知植物生长的槽的宽是20cm。
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt

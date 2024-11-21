@@ -1,6 +1,6 @@
 //
 // Created by liryi on 24-11-7.
-//
+//4.分割获取谷子的各叶片，即把每个叶片独立分割，并用不同颜色表示。
 #include <opencv2/opencv.hpp>
 #include <iostream>
 

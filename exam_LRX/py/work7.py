@@ -1,3 +1,4 @@
+# 7.给出图像增强处理中的灰度变换中的线性变换和非线性变换的实例。
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt

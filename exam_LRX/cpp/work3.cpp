@@ -1,6 +1,6 @@
 //
 // Created by liryi on 24-11-7.
-//
+//3.采用图像形态学获取图像中小米的粒数、每粒小米的最大投影面积或者外接最大正方形的长与宽。
 #include <opencv2/opencv.hpp>
 #include <iostream>
 #include <vector>
