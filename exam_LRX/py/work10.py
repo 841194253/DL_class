@@ -1,3 +1,4 @@
+# 10.给出图像处理中频域滤波法中理想低通滤波器、Butterworth低通滤波器、高斯低通滤波器实例各一个。
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
