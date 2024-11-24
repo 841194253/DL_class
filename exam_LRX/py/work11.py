@@ -1,3 +1,4 @@
+# 11.给出图像处理中频域滤波法的同态滤波和Retinex滤波实例各一个。
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
@@ -9,7 +10,6 @@ rcParams['axes.unicode_minus'] = False  # 解决负号显示问题
 
 # 读取原始图像
 image = cv2.imread("../image/image9.png", cv2.IMREAD_GRAYSCALE)
-
 
 # 同态滤波
 def homomorphic_filter(img, low_gamma=0.5, high_gamma=2.0, cutoff=30):

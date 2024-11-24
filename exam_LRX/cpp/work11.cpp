@@ -1,23 +1,23 @@
 //
-// Created by liryi on 24-11-22.
-// 10.给出图像处理中频域滤波法中理想低通滤波器、Butterworth低通滤波器、高斯低通滤波器实例各一个。
+// Created by liryi on 24-11-24.
+// 11.给出图像处理中频域滤波法的同态滤波和Retinex滤波实例各一个。
 #include <opencv2/opencv.hpp>
-#include <iostream>
 #include <cmath>
+#include <iostream>
 
 using namespace cv;
 using namespace std;
 
-// 频谱中心转换
-void shiftDFT(Mat& src, Mat& dst) {
-    dst = src.clone();
-    int cx = dst.cols / 2;
-    int cy = dst.rows / 2;
+// DFT中心变换
+void shiftDFT(Mat& image, Mat& shifted) {
+    shifted = image.clone();
+    int cx = image.cols / 2;
+    int cy = image.rows / 2;
 
-    Mat q0(dst, Rect(0, 0, cx, cy));
-    Mat q1(dst, Rect(cx, 0, cx, cy));
-    Mat q2(dst, Rect(0, cy, cx, cy));
-    Mat q3(dst, Rect(cx, cy, cx, cy));
+    Mat q0(shifted, Rect(0, 0, cx, cy));
+    Mat q1(shifted, Rect(cx, 0, cx, cy));
+    Mat q2(shifted, Rect(0, cy, cx, cy));
+    Mat q3(shifted, Rect(cx, cy, cx, cy));
 
     Mat tmp;
     q0.copyTo(tmp);
@@ -30,15 +30,14 @@ void shiftDFT(Mat& src, Mat& dst) {
 }
 
 // 理想低通滤波器
-Mat idealLowpassFilter(Size size, int cutoff) {
-    Mat filter(size, CV_32F, Scalar(0));
+Mat idealLowpassFilter(Size size, float cutoff) {
+    Mat filter = Mat::zeros(size, CV_32F);
     Point center(size.width / 2, size.height / 2);
-
     for (int i = 0; i < size.height; ++i) {
         for (int j = 0; j < size.width; ++j) {
-            double distance = sqrt(pow(i - center.y, 2) + pow(j - center.x, 2));
+            float distance = sqrt(pow(i - center.y, 2) + pow(j - center.x, 2));
             if (distance <= cutoff) {
-                filter.at<float>(i, j) = 1.0;
+                filter.at<float>(i, j) = 1.0f;
             }
         }
     }
@@ -46,34 +45,32 @@ Mat idealLowpassFilter(Size size, int cutoff) {
 }
 
 // Butterworth低通滤波器
-Mat butterworthLowpassFilter(Size size, int cutoff, int order) {
-    Mat filter(size, CV_32F, Scalar(0));
+Mat butterworthLowpassFilter(Size size, float cutoff, int order = 2) {
+    Mat filter = Mat::zeros(size, CV_32F);
     Point center(size.width / 2, size.height / 2);
-
     for (int i = 0; i < size.height; ++i) {
         for (int j = 0; j < size.width; ++j) {
-            double distance = sqrt(pow(i - center.y, 2) + pow(j - center.x, 2));
-            filter.at<float>(i, j) = 1.0 / (1.0 + pow(distance / cutoff, 2 * order));
+            float distance = sqrt(pow(i - center.y, 2) + pow(j - center.x, 2));
+            filter.at<float>(i, j) = 1.0f / (1.0f + pow(distance / cutoff, 2 * order));
         }
     }
     return filter;
 }
 
 // 高斯低通滤波器
-Mat gaussianLowpassFilter(Size size, int cutoff) {
-    Mat filter(size, CV_32F, Scalar(0));
+Mat gaussianLowpassFilter(Size size, float cutoff) {
+    Mat filter = Mat::zeros(size, CV_32F);
     Point center(size.width / 2, size.height / 2);
-
     for (int i = 0; i < size.height; ++i) {
         for (int j = 0; j < size.width; ++j) {
-            double distance = sqrt(pow(i - center.y, 2) + pow(j - center.x, 2));
-            filter.at<float>(i, j) = exp(-(pow(distance, 2)) / (2 * pow(cutoff, 2)));
+            float distance = sqrt(pow(i - center.y, 2) + pow(j - center.x, 2));
+            filter.at<float>(i, j) = exp(-(distance * distance) / (2 * cutoff * cutoff));
         }
     }
     return filter;
 }
 
-// 应用滤波器
+// 应用滤波器并保存频谱
 Mat applyFilter(const Mat& image, const Mat& filter, Mat& spectrumBefore, Mat& spectrumAfter) {
     Mat padded;
     int m = getOptimalDFTSize(image.rows);
@@ -142,33 +139,34 @@ void displayFilters(const Mat& originalImage, const Mat& idealImage, const Mat& 
 }
 
 int main() {
+    // 读取灰度图像
     Mat image = imread("E:\\DL_class\\exam_LRX\\cpp\\images\\image9.png", IMREAD_GRAYSCALE);
     if (image.empty()) {
-        cout << "Error: Image not found!" << endl;
+        cout << "image error" << endl;
         return -1;
     }
 
-    int cutoff = 50;
-    int order = 2;
+    // 定义滤波器参数
+    float cutoff = 50.0;
+    int butterworthOrder = 2;
 
+    // 生成滤波器
     Mat idealFilter = idealLowpassFilter(image.size(), cutoff);
-    Mat butterworthFilter = butterworthLowpassFilter(image.size(), cutoff, order);
+    Mat butterworthFilter = butterworthLowpassFilter(image.size(), cutoff, butterworthOrder);
     Mat gaussianFilter = gaussianLowpassFilter(image.size(), cutoff);
 
-    Mat idealResult, butterworthResult, gaussianResult;
+    // 保存频谱
     Mat idealSpectrumBefore, idealSpectrumAfter;
     Mat butterworthSpectrumBefore, butterworthSpectrumAfter;
     Mat gaussianSpectrumBefore, gaussianSpectrumAfter;
 
-    idealResult = applyFilter(image, idealFilter, idealSpectrumBefore, idealSpectrumAfter);
-    butterworthResult = applyFilter(image, butterworthFilter, butterworthSpectrumBefore, butterworthSpectrumAfter);
-    gaussianResult = applyFilter(image, gaussianFilter, gaussianSpectrumBefore, gaussianSpectrumAfter);
+    // 应用滤波器
+    Mat idealResult = applyFilter(image, idealFilter, idealSpectrumBefore, idealSpectrumAfter);
+    Mat butterworthResult = applyFilter(image, butterworthFilter, butterworthSpectrumBefore, butterworthSpectrumAfter);
+    Mat gaussianResult = applyFilter(image, gaussianFilter, gaussianSpectrumBefore, gaussianSpectrumAfter);
 
     // 显示结果
     displayFilters(image, idealResult, butterworthResult, gaussianResult);
 
     return 0;
 }
-
-
-

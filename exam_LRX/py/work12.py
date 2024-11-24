@@ -1,3 +1,4 @@
+# 12.采用形态学处理算分，填补字母和其他形状物体中的空洞（左图是需要填充的图，右图是填充的结果）
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt

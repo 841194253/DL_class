@@ -1,33 +1,41 @@
+# 13.给出采用形态学处理应用提取图像边界的实例一个。
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 
-# 读取图像并转换为灰度图
-image = cv2.imread('../image/image2.png', cv2.IMREAD_GRAYSCALE)  # 替换为您的文件路径
+def main():
+    # 读取图像
+    src = cv2.imread("../image/image2.png")
+    if src is None:
+        print("无法读取图像文件！")
+        return
 
-# 二值化处理（如果图像不是二值图像）
-_, binary_image = cv2.threshold(image, 128, 255, cv2.THRESH_BINARY)
+    # 将 BGR 图像转换为 RGB 格式，以便在 plt 中显示
+    src_rgb = cv2.cvtColor(src, cv2.COLOR_BGR2RGB)
 
-# 定义结构元素（可根据需求调整大小和形状）
-kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (5, 5))
+    # 定义结构元素
+    element = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3), (-1, -1))
 
-# 计算形态学梯度（提取边界）
-gradient_image = cv2.morphologyEx(binary_image, cv2.MORPH_GRADIENT, kernel)
+    # 执行腐蚀操作
+    eroded = cv2.erode(src, element)
+    eroded_rgb = cv2.cvtColor(eroded, cv2.COLOR_BGR2RGB)
 
-# 显示结果
-plt.figure(figsize=(10, 5))
+    # 计算原始图像与腐蚀图像的差异
+    diff = cv2.absdiff(src, eroded)
 
-# 左图：原始图像
-plt.subplot(1, 2, 1)
-plt.imshow(binary_image, cmap="gray")
-plt.title("Original Image")
-plt.axis("off")
+    # 将差异图像转换为 RGB 格式
+    diff_rgb = cv2.cvtColor(diff, cv2.COLOR_BGR2RGB)
 
-# 右图：提取的边界
-plt.subplot(1, 2, 2)
-plt.imshow(gradient_image, cmap="gray")
-plt.title("Extracted Boundaries")
-plt.axis("off")
+    # 拼接图像（原图、腐蚀图、差异图）
+    display = np.hstack((src_rgb, eroded_rgb, diff_rgb))
 
-plt.tight_layout()
-plt.show()
+    # 显示拼接后的图像
+    plt.figure(figsize=(12, 6))
+    plt.imshow(display)
+    plt.title('Original | Eroded | Difference')
+    plt.axis('off')  # 关闭坐标轴
+    plt.show()
+
+if __name__ == "__main__":
+    main()
+
