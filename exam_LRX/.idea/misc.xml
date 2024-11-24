@@ -4,10 +4,10 @@
     <option name="sdkName" value="Python 3.9(yolov7-main)" />
   </component>
   <component name="CMakePythonSetting">
-    <option name="pythonIntegrationState" value="YES" />
+    <option name="pythonIntegrationState" value="NO" />
   </component>
   <component name="CMakeWorkspace" PROJECT_DIR="$PROJECT_DIR$/cpp">
     <contentRoot DIR="$PROJECT_DIR$" />
   </component>
-  <component name="WestSettings"><![CDATA[{}]]></component>
+  <component name="WestSettings">{}</component>
 </project>

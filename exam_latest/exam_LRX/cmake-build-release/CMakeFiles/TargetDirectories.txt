@@ -1,0 +1,8 @@
+E:/DL_class/exam_latest/exam_LRX/cmake-build-release/CMakeFiles/work1.dir
+E:/DL_class/exam_latest/exam_LRX/cmake-build-release/CMakeFiles/work2.dir
+E:/DL_class/exam_latest/exam_LRX/cmake-build-release/CMakeFiles/work3.dir
+E:/DL_class/exam_latest/exam_LRX/cmake-build-release/CMakeFiles/work4.dir
+E:/DL_class/exam_latest/exam_LRX/cmake-build-release/CMakeFiles/work5.dir
+E:/DL_class/exam_latest/exam_LRX/cmake-build-release/CMakeFiles/work6.dir
+E:/DL_class/exam_latest/exam_LRX/cmake-build-release/CMakeFiles/edit_cache.dir
+E:/DL_class/exam_latest/exam_LRX/cmake-build-release/CMakeFiles/rebuild_cache.dir

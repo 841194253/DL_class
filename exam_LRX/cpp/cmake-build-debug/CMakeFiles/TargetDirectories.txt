@@ -1,3 +1,14 @@
 E:/DL_class/exam_LRX/cpp/cmake-build-debug/CMakeFiles/work1.dir
+E:/DL_class/exam_LRX/cpp/cmake-build-debug/CMakeFiles/work2.dir
+E:/DL_class/exam_LRX/cpp/cmake-build-debug/CMakeFiles/work3.dir
+E:/DL_class/exam_LRX/cpp/cmake-build-debug/CMakeFiles/work4.dir
+E:/DL_class/exam_LRX/cpp/cmake-build-debug/CMakeFiles/work6.dir
+E:/DL_class/exam_LRX/cpp/cmake-build-debug/CMakeFiles/work7.dir
+E:/DL_class/exam_LRX/cpp/cmake-build-debug/CMakeFiles/work8.dir
+E:/DL_class/exam_LRX/cpp/cmake-build-debug/CMakeFiles/work9.dir
+E:/DL_class/exam_LRX/cpp/cmake-build-debug/CMakeFiles/work10.dir
+E:/DL_class/exam_LRX/cpp/cmake-build-debug/CMakeFiles/work11.dir
+E:/DL_class/exam_LRX/cpp/cmake-build-debug/CMakeFiles/work12.dir
+E:/DL_class/exam_LRX/cpp/cmake-build-debug/CMakeFiles/work13.dir
 E:/DL_class/exam_LRX/cpp/cmake-build-debug/CMakeFiles/edit_cache.dir
 E:/DL_class/exam_LRX/cpp/cmake-build-debug/CMakeFiles/rebuild_cache.dir

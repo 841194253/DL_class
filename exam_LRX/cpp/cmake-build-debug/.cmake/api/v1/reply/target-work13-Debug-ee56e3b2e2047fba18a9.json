@@ -1,0 +1,201 @@
+{
+	"artifacts" : 
+	[
+		{
+			"path" : "work13.exe"
+		},
+		{
+			"path" : "work13.pdb"
+		}
+	],
+	"backtrace" : 1,
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"add_executable",
+			"target_link_libraries"
+		],
+		"files" : 
+		[
+			"CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 34,
+				"parent" : 0
+			},
+			{
+				"command" : 1,
+				"file" : 0,
+				"line" : 48,
+				"parent" : 0
+			}
+		]
+	},
+	"compileGroups" : 
+	[
+		{
+			"compileCommandFragments" : 
+			[
+				{
+					"fragment" : "-g -std=gnu++11 -fdiagnostics-color=always"
+				}
+			],
+			"includes" : 
+			[
+				{
+					"backtrace" : 2,
+					"isSystem" : true,
+					"path" : "E:/DL_class/exam_LRX/cpp/package/opencv/include"
+				}
+			],
+			"language" : "CXX",
+			"languageStandard" : 
+			{
+				"backtraces" : 
+				[
+					2
+				],
+				"standard" : "11"
+			},
+			"sourceIndexes" : 
+			[
+				0
+			]
+		}
+	],
+	"id" : "work13::@6890427a1f51a3e7e1df",
+	"link" : 
+	{
+		"commandFragments" : 
+		[
+			{
+				"fragment" : "-g",
+				"role" : "flags"
+			},
+			{
+				"fragment" : "",
+				"role" : "flags"
+			},
+			{
+				"backtrace" : 2,
+				"fragment" : "E:\\DL_class\\exam_LRX\\cpp\\package\\opencv\\x64\\mingw\\lib\\libopencv_world4100.dll.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 2,
+				"fragment" : "E:\\DL_class\\exam_LRX\\cpp\\package\\opencv\\x64\\mingw\\lib\\libopencv_world4100.dll.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 2,
+				"fragment" : "E:\\DL_class\\exam_LRX\\cpp\\package\\opencv\\x64\\mingw\\lib\\libopencv_world4100.dll.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 2,
+				"fragment" : "E:\\DL_class\\exam_LRX\\cpp\\package\\opencv\\x64\\mingw\\lib\\libopencv_world4100.dll.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 2,
+				"fragment" : "E:\\DL_class\\exam_LRX\\cpp\\package\\opencv\\x64\\mingw\\lib\\libopencv_world4100.dll.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 2,
+				"fragment" : "E:\\DL_class\\exam_LRX\\cpp\\package\\opencv\\x64\\mingw\\lib\\libopencv_world4100.dll.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 2,
+				"fragment" : "E:\\DL_class\\exam_LRX\\cpp\\package\\opencv\\x64\\mingw\\lib\\libopencv_world4100.dll.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 2,
+				"fragment" : "E:\\DL_class\\exam_LRX\\cpp\\package\\opencv\\x64\\mingw\\lib\\libopencv_world4100.dll.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 2,
+				"fragment" : "E:\\DL_class\\exam_LRX\\cpp\\package\\opencv\\x64\\mingw\\lib\\libopencv_world4100.dll.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 2,
+				"fragment" : "E:\\DL_class\\exam_LRX\\cpp\\package\\opencv\\x64\\mingw\\lib\\libopencv_world4100.dll.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 2,
+				"fragment" : "E:\\DL_class\\exam_LRX\\cpp\\package\\opencv\\x64\\mingw\\lib\\libopencv_world4100.dll.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 2,
+				"fragment" : "E:\\DL_class\\exam_LRX\\cpp\\package\\opencv\\x64\\mingw\\lib\\libopencv_world4100.dll.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 2,
+				"fragment" : "E:\\DL_class\\exam_LRX\\cpp\\package\\opencv\\x64\\mingw\\lib\\libopencv_world4100.dll.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 2,
+				"fragment" : "E:\\DL_class\\exam_LRX\\cpp\\package\\opencv\\x64\\mingw\\lib\\libopencv_world4100.dll.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 2,
+				"fragment" : "E:\\DL_class\\exam_LRX\\cpp\\package\\opencv\\x64\\mingw\\lib\\libopencv_world4100.dll.a",
+				"role" : "libraries"
+			},
+			{
+				"backtrace" : 2,
+				"fragment" : "E:\\DL_class\\exam_LRX\\cpp\\package\\opencv\\x64\\mingw\\lib\\libopencv_world4100.dll.a",
+				"role" : "libraries"
+			},
+			{
+				"fragment" : "-lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32",
+				"role" : "libraries"
+			}
+		],
+		"language" : "CXX"
+	},
+	"name" : "work13",
+	"nameOnDisk" : "work13.exe",
+	"paths" : 
+	{
+		"build" : ".",
+		"source" : "."
+	},
+	"sourceGroups" : 
+	[
+		{
+			"name" : "Source Files",
+			"sourceIndexes" : 
+			[
+				0
+			]
+		}
+	],
+	"sources" : 
+	[
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "work13.cpp",
+			"sourceGroupIndex" : 0
+		}
+	],
+	"type" : "EXECUTABLE"
+}

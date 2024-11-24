@@ -1,3 +1,4 @@
+# 5.还原图中被部分遮挡的苹果
 # import cv2
 # import numpy as np
 # import matplotlib.pyplot as plt
@@ -49,30 +50,56 @@
 
 from tkinter import *
 import tkinter.filedialog
-from PIL import Image, ImageFilter, ImageTk
+from PIL import Image, ImageTk
 import os
 import tkinter.messagebox
-import tkinter.ttk
 import numpy as np
 import cv2 as cv
 
-sizex = 0
-sizey = 0
-quality = 100
 path = ''
-output_path = None
-output_file = None
+original_img = None  # 原始图片
+current_img = None  # 当前绘制的图片
+inpaintMask = None  # 修复掩膜
+sketch = None  # 绘制工具
+original_format = ''  # 保存原始图片格式
+
 root = Tk()
-root.geometry()
-label_img = None
-
-# 设置窗口标题
 root.title('图片智能修复')
+root.geometry('900x700')
 
+# 显示文件路径
+lb_path = Label(root, text='请选择图片文件', wraplength=400)
+lb_path.pack()
 
-# 用于处理鼠标的OpenCV实用类
+# 创建用于显示原始图片和修改后图片的框
+frame = Frame(root)
+frame.pack()
+
+# 原始图片框
+original_frame = Frame(frame, width=400, height=400, bg='lightgrey')
+original_frame.grid(row=0, column=0, padx=5, pady=5)
+original_label = Label(original_frame, text='原始图片')
+original_label.pack(fill=BOTH, expand=True)
+
+# 修改后图片框
+modified_frame = Frame(frame, width=400, height=400, bg='lightgrey')
+modified_frame.grid(row=0, column=1, padx=5, pady=5)
+modified_label = Label(modified_frame, text='修改后的图片')
+modified_label.pack(fill=BOTH, expand=True)
+
+# 保存文件名输入框
+save_name_var = StringVar(value='修复结果')
+save_name_label = Label(root, text="保存文件名：")
+save_name_label.pack()
+save_name_entry = Entry(root, textvariable=save_name_var, width=30)
+save_name_entry.pack()
+
+# 提示信息
+lb_info = Label(root, text="按下 't' 使用 FMM 修复, 按下 'n' 使用 NS 修复, 按下 'r' 重新绘制", wraplength=500)
+lb_info.pack()
+
 class Sketcher:
-
+    """用于绘制修复区域的工具"""
     def __init__(self, windowname, dests, colors_func):
         self.prev_pt = None
         self.windowname = windowname
@@ -84,9 +111,6 @@ class Sketcher:
 
     def show(self):
         cv.imshow(self.windowname, self.dests[0])
-        # cv.imshow(self.windowname + ": mask", self.dests[1])
-
-    # 鼠标处理的onMouse函数
 
     def on_mouse(self, event, x, y, flags, param):
         pt = (x, y)
@@ -102,107 +126,119 @@ class Sketcher:
             self.prev_pt = pt
             self.show()
 
+# 设置按钮功能
+def load_image():
+    global path, original_img, current_img, inpaintMask, sketch, original_format
+    path = tkinter.filedialog.askopenfilename(title='选择图片', filetypes=[('图像文件', '*.jpg *.png *.bmp')])
+    if not path:
+        tkinter.messagebox.showwarning('警告', '未选择文件')
+        return
 
-# 载入图像
-def loadimg():
-    global path
-    global sizex
-    global sizey
-    path = tkinter.filedialog.askopenfilename()
-    lb.config(text=path)
-    if path != '':
-        try:
-            img = Image.open(path)
-            sizex = img.size[0]
-            sizey = img.size[1]
-            img = img.resize((400, 400), Image.ANTIALIAS)
-            global img_origin
-            img_origin = ImageTk.PhotoImage(img)
-            global label_img
-            label_img.configure(image=img_origin)
-            label_img.pack()
+    lb_path.config(text=f"已选择文件：{path}")
+    img = cv.imread(path, cv.IMREAD_COLOR)
+    if img is None:
+        tkinter.messagebox.showerror('错误', '无法加载图片')
+        return
 
-        except OSError:
-            tkinter.messagebox.showerror('错误', '图片格式错误，无法识别')
+    # 获取原始图片格式
+    original_format = os.path.splitext(path)[1].lower()
 
+    # 初始化图像和掩膜
+    original_img = img.copy()
+    current_img = img.copy()
+    inpaintMask = np.zeros(img.shape[:2], np.uint8)
 
-def inpaint(path):
-    def function(img):
-        try:
+    # 更新原始图片和修改后图片显示
+    update_original_preview(img)
+    update_modified_preview(img)
 
-            # 创建一个原始图像的副本
-            img_mask = img.copy()
-            # 创建原始图像的黑色副本
-            # Acts as a mask
-            inpaintMask = np.zeros(img.shape[:2], np.uint8)
+def update_original_preview(img):
+    """更新原始图片的预览"""
+    img_rgb = cv.cvtColor(img, cv.COLOR_BGR2RGB)
+    img_pil = Image.fromarray(img_rgb)
+    img_tk = ImageTk.PhotoImage(img_pil)
+    original_label.configure(image=img_tk)
+    original_label.image = img_tk
 
-            # Create sketch using OpenCV Utility Class: Sketcher
-            sketch = Sketcher('image', [img_mask, inpaintMask], lambda: ((255, 255, 255), 255))
+def update_modified_preview(img):
+    """更新修改后图片的预览"""
+    img_rgb = cv.cvtColor(img, cv.COLOR_BGR2RGB)
+    img_pil = Image.fromarray(img_rgb)
+    img_tk = ImageTk.PhotoImage(img_pil)
+    modified_label.configure(image=img_tk)
+    modified_label.image = img_tk
 
-            ch = cv.waitKey()
+def start_edit():
+    global sketch
+    if original_img is None:
+        tkinter.messagebox.showwarning('警告', '请先加载图片')
+        return
 
-            if ch == ord('t'):
-                # 使用Alexendra Telea提出的算法。快速行进法
-                res = cv.inpaint(src=img_mask, inpaintMask=inpaintMask, inpaintRadius=3, flags=cv.INPAINT_TELEA)
-                cv.imshow('Inpaint Output using FMM', res)
-                cv.waitKey()
-                cv.imwrite(path, res)
+    def color_func():
+        return ((255, 255, 255), 255)  # 白色画笔
 
-            if ch == ord('n'):
-                # 使用Bertalmio, Marcelo, Andrea L. Bertozzi和Guillermo Sapiro提出的算法：Navier-Stokes, 流体动力学，以及图像和视频的绘制
-                res = cv.inpaint(src=img_mask, inpaintMask=inpaintMask, inpaintRadius=3, flags=cv.INPAINT_NS)
-                cv.imshow('Inpaint Output using NS Technique', res)
-                cv.waitKey()
-                cv.imwrite(path, res)
+    sketch = Sketcher('image', [current_img, inpaintMask], color_func)
+    cv.imshow('image', current_img)
+    cv.waitKey(0)
+    cv.destroyAllWindows()
+    update_modified_preview(current_img)  # 更新修改后的预览
 
-            if ch == ord('r'):
-                img_mask[:] = img
-                inpaintMask[:] = 0
-                sketch.show()
+def apply_inpaint(method='FMM'):
+    """应用修复算法"""
+    global current_img
+    if original_img is None:
+        tkinter.messagebox.showwarning('警告', '请先加载图片')
+        return
 
-            cv.destroyAllWindows()
-        except ValueError as e:
-            tkinter.messagebox.showerror('', repr(e))
+    flags = cv.INPAINT_TELEA if method == 'FMM' else cv.INPAINT_NS
+    current_img = cv.inpaint(original_img, inpaintMask, inpaintRadius=3, flags=flags)
+    update_modified_preview(current_img)
 
-    if path != '':
-        try:
-            img = Image.open(path)
-            img1 = cv.imread(path, cv.IMREAD_COLOR)
-            img1 = function(img1)
+def save_image():
+    """保存最终结果"""
+    global current_img, path, original_format
+    if current_img is None:
+        tkinter.messagebox.showwarning('警告', '没有可保存的图片')
+        return
 
+    save_name = save_name_var.get().strip()
+    if not save_name:
+        tkinter.messagebox.showwarning('警告', '保存文件名不能为空')
+        return
 
-        except OSError:
-            lb.config(text="您没有选择任何文件")
-            tkinter.messagebox.showerror('错误', '图片格式错误，无法识别')
+    save_path = os.path.join(os.path.dirname(path), save_name + original_format)
+    if original_format not in ['.jpg', '.png', '.bmp']:
+        save_path += '.jpg'  # 默认保存为 JPG
 
-    else:
-        tkinter.messagebox.showerror('错误', '未发现路径')
+    cv.imwrite(save_path, current_img)
+    tkinter.messagebox.showinfo('成功', f'图片已保存到：\n{save_path}')
 
+# 按键事件处理
+def key_event_handler(event):
+    """处理键盘事件"""
+    if event.char == 't':
+        apply_inpaint(method='FMM')
+    elif event.char == 'n':
+        apply_inpaint(method='NS')
+    elif event.char == 'r':
+        start_edit()
 
-lb = Label(root, text='会在原路径保存图像')
-lb.pack()
+# 绑定按键事件
+root.bind("<Key>", key_event_handler)
 
-lb1 = Label(root, text='警告：会覆盖原图片', width=27, height=2, font=("Arial", 10), bg="red")
-lb1.pack(side='top')
+# 按钮布局
+btn_load = Button(root, text="选择图片", command=load_image)
+btn_load.pack()
 
-btn = Button(root, text="选择图片", command=loadimg)
-btn.pack()
+btn_save = Button(root, text="保存图片", command=save_image)
+btn_save.pack()
 
-lb2 = Label(root, text='按下开始绘制想要修复的位置')
-lb2.pack()
-
-btn2 = Button(root, text="开始", command=lambda: inpaint(path))
-btn2.pack()
-
-lb3 = Label(root, text='绘制完成使用以下步骤')
-lb3.pack()
-
-lb4 = Label(root, text='t-使用FMM修复\nn-使用NS方法修复\nr-重新绘制区域')
-lb4.pack()
-
-label_img = tkinter.Label(root, text='原始图片')
-label_img.pack()
-
+# Tkinter 主循环
 root.mainloop()
+
+
+
+
+
 
 

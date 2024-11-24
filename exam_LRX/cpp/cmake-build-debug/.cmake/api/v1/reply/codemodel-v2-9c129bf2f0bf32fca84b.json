@@ -1,0 +1,159 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"jsonFile" : "directory-.-Debug-d0094a50bb2071803777.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.10"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5,
+						6,
+						7,
+						8,
+						9,
+						10,
+						11
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "OpenCV_work",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5,
+						6,
+						7,
+						8,
+						9,
+						10,
+						11
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "work1::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-work1-Debug-754eab05c2e23c65e4ae.json",
+					"name" : "work1",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "work10::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-work10-Debug-d06e0951121af72c911a.json",
+					"name" : "work10",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "work11::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-work11-Debug-efb036d4cf03adc85afb.json",
+					"name" : "work11",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "work12::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-work12-Debug-9bf24956c82a0deb0f23.json",
+					"name" : "work12",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "work13::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-work13-Debug-ee56e3b2e2047fba18a9.json",
+					"name" : "work13",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "work2::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-work2-Debug-98652c509b19bd56ac2e.json",
+					"name" : "work2",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "work3::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-work3-Debug-1260829ff0a34e43538b.json",
+					"name" : "work3",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "work4::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-work4-Debug-4d04ad0a57983688dccb.json",
+					"name" : "work4",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "work6::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-work6-Debug-4a72961431e046a8a2fd.json",
+					"name" : "work6",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "work7::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-work7-Debug-c1dfe3a0fe51bd7c1e1e.json",
+					"name" : "work7",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "work8::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-work8-Debug-3d0429ec609389fea7e8.json",
+					"name" : "work8",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "work9::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-work9-Debug-5a3a7e26989e38d629c3.json",
+					"name" : "work9",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "E:/DL_class/exam_LRX/cpp/cmake-build-debug",
+		"source" : "E:/DL_class/exam_LRX/cpp"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 7
+	}
+}

@@ -1,33 +1,15 @@
-"E:\CLion 2024.2.3\bin\cmake\win\x64\bin\cmake.exe" -DCMAKE_BUILD_TYPE=Debug "-DCMAKE_MAKE_PROGRAM=E:/CLion 2024.2.3/bin/ninja/win/x64/ninja.exe" -G Ninja -DPython_EXECUTABLE=E:/anconda/Anaconda3/envs/yolov7/python.exe -DPython3_EXECUTABLE=E:/anconda/Anaconda3/envs/yolov7/python.exe -S E:\DL_class\exam_LRX\cpp -B E:\DL_class\exam_LRX\cpp\cmake-build-debug
--- The C compiler identification is GNU 14.2.0
--- The CXX compiler identification is GNU 14.2.0
--- Detecting C compiler ABI info
--- Detecting C compiler ABI info - done
--- Check for working C compiler: E:/mingw64/bin/gcc.exe - skipped
--- Detecting C compile features
--- Detecting C compile features - done
--- Detecting CXX compiler ABI info
--- Detecting CXX compiler ABI info - done
--- Check for working CXX compiler: E:/mingw64/bin/c++.exe - skipped
--- Detecting CXX compile features
--- Detecting CXX compile features - done
+"E:\CLion 2024.2.3\bin\cmake\win\x64\bin\cmake.exe" -DCMAKE_BUILD_TYPE=Debug "-DCMAKE_MAKE_PROGRAM=E:/CLion 2024.2.3/bin/ninja/win/x64/ninja.exe" -G Ninja -S E:\DL_class\exam_LRX\cpp -B E:\DL_class\exam_LRX\cpp\cmake-build-debug
 -- OpenCV ARCH: x64
 -- OpenCV RUNTIME: mingw
 -- OpenCV STATIC: OFF
--- Found OpenCV: E:/DL_class/exam_LRX/cpp/package/opencv (found version "4.10.0")
 -- Found OpenCV 4.10.0 in E:/DL_class/exam_LRX/cpp/package/opencv/x64/mingw/lib
 -- You might need to add E:\DL_class\exam_LRX\cpp\package\opencv\x64\mingw\bin to your PATH to be able to run your applications.
 -- OpenCV library status:
+-- OpenCV VERSION: 4.10.0
 -- OpenCV Directory: E:/DL_class/exam_LRX/cpp/package/opencv
 -- OpenCV Include Directory: E:/DL_class/exam_LRX/cpp/package/opencv/include
 -- OpenCV Library Directory: opencv_calib3d;opencv_core;opencv_dnn;opencv_features2d;opencv_flann;opencv_gapi;opencv_highgui;opencv_imgcodecs;opencv_imgproc;opencv_ml;opencv_objdetect;opencv_photo;opencv_stitching;opencv_video;opencv_videoio;opencv_world
--- Configuring done (3.1s)
+-- PNG File: E:/DL_class/exam_LRX/cpp/images/image1.png;E:/DL_class/exam_LRX/cpp/images/image10.png;E:/DL_class/exam_LRX/cpp/images/image2.png;E:/DL_class/exam_LRX/cpp/images/image3.png;E:/DL_class/exam_LRX/cpp/images/image4.png;E:/DL_class/exam_LRX/cpp/images/image5.png;E:/DL_class/exam_LRX/cpp/images/image6.png;E:/DL_class/exam_LRX/cpp/images/image6to7.png;E:/DL_class/exam_LRX/cpp/images/image7.png;E:/DL_class/exam_LRX/cpp/images/image8.png;E:/DL_class/exam_LRX/cpp/images/image9.png
+-- Configuring done (0.2s)
 -- Generating done (0.0s)
-CMake Warning:
-  Manually-specified variables were not used by the project:
-
-    Python3_EXECUTABLE
-    Python_EXECUTABLE
-
-
 -- Build files have been written to: E:/DL_class/exam_LRX/cpp/cmake-build-debug
