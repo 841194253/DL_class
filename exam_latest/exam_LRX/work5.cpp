@@ -1,11 +1,11 @@
 //
 // Created by liryi on 24-11-24.
 //
-#include "opencv2/opencv.hpp" // 引入OpenCV相关库
-#include <iostream> // 引入标准输入输出流库
+#include "opencv2/opencv.hpp"
+#include <iostream>
 
-using namespace cv; // 使用OpenCV命名空间
-using namespace std; // 使用标准命名空间
+using namespace cv;
+using namespace std;
 
 Mat img, inpaintMask; // 声明原图和掩码图像
 Point prevPt(-1, -1); // 上一个鼠标点击点，用于绘制线条
@@ -62,3 +62,16 @@ int main() {
 
     return 0; // 程序结束
 }
+
+//逻辑：
+//图像加载： 从硬编码路径读取目标图像并显示。
+//掩码初始化： 创建与图像同尺寸的空白掩码，用于标记需要修复的区域。
+//鼠标交互：
+//鼠标拖动绘制修复区域，实时更新原图和掩码。
+//按键操作：
+//ESC: 退出程序。
+//r: 恢复原图，清空掩码。
+//i/空格: 调用 cv::inpaint 修复绘制区域，显示修复后的图像。
+//结果分析：
+//修复算法 INPAINT_TELEA 平滑填充用户标记区域，效果依赖输入掩码的准确性。
+//按键功能灵活，适合修复不连续或杂乱区域。

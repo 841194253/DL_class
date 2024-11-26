@@ -236,7 +236,7 @@ btn_save.pack()
 # Tkinter 主循环
 root.mainloop()
 
-
+# 这段代码实现了一个基于 Tkinter 的 GUI 程序，用于图像修复操作，结合了 OpenCV 的绘制功能和两种修复算法（FMM 和 NS）
 
 
 
