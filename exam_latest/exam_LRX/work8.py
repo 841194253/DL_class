@@ -1,21 +1,67 @@
 # tensorboard --logdir=./logs 查看日志和图表
 # 用resnet实现对CIFAR-10的分类
 
-# 残差块的数量
-# 代码中定义了 stack_n = 5，即每个阶段有 5 个残差块。这个 stack_n 控制每个阶段的深度。
-# 每个阶段有 stack_n 个残差块，且有三个阶段：
-# 第一个阶段：x = residual_block(x, 16, False)（重复 stack_n=5 次）
-# 第二个阶段：x = residual_block(x, 32, True)（这个阶段中会有一次步长为 (2, 2) 的卷积操作，进行下采样）
-# 第三个阶段：x = residual_block(x, 64, True)（同样进行下采样）
+# 网络结构
+# 在 ResNet-32 中，每个阶段（Stage）由多个残差块（Residual Block）组成。ResNet-32 的典型配置如下：
+# 第一阶段：输入卷积层
+# 第二阶段：堆叠多个残差块
+# 第三阶段：下采样并增加通道数
+# 最终层：池化和全连接层
+# 每一层的作用
+# 卷积层：每个卷积层都会增加网络的深度。
+# 残差块：每个残差块通常由两层卷积层组成，且每个残差块的输入和输出维度相同。
+# 每个阶段的堆叠数：在 ResNet-32 中，每个阶段包含一定数量的残差块，通常每个阶段的残差块数量相同。
+# ResNet-32 具体层数计算
+# 网络结构如下：
+# 第一层（输入卷积层）：1 层。
+# 每个阶段：每个残差块由 2 层卷积构成，因此一个残差块有 2 层卷积，多个残差块的总层数为 2 * 残差块数。
+# 在 ResNet-32 中，第一阶段有 5 个残差块，因此有 5 * 2 = 10 层卷积。
+# 第二阶段有 5 个残差块，因此也是 5 * 2 = 10 层卷积。
+# 第三阶段有 5 个残差块，也是 5 * 2 = 10 层卷积。
+# 全连接层：1 层。
 # 计算总层数
-# 每个阶段的 stack_n = 5，每个残差块由两个卷积层和一个跳跃连接组成，所以每个阶段的卷积层数是 2 * stack_n。
-# 但是，如果算上每个阶段的初始卷积层（在输入阶段进行的卷积）以及全连接层和池化层，总层数如下：
-# 第一阶段的卷积层数：1 + 5（对应每个残差块的 2 层卷积，共 5 个残差块）= 1 + 5*2 = 11 层
-# 第二阶段的卷积层数：1 + 5*2 = 11 层（同样的结构）
-# 第三阶段的卷积层数：1 + 5*2 = 11 层（同样的结构）
-# 最终的池化层 + 全连接层：1 层池化 + 1 层全连接
-# 因此，网络的总层数大致为：
-# 11 (第一阶段) + 11 (第二阶段) + 11 (第三阶段) + 2 (池化 + 全连接) = 35 层
+# 输入卷积层：1 层
+# 每个阶段的残差块：每个残差块有 2 层卷积，堆叠 5 个残差块时，共有 5 * 2 = 10 层卷积
+# 最终的全连接层：1 层
+# 因此，ResNet-32 的总层数为：
+# 1（输入卷积层）
+# 10（第一阶段的 5 个残差块，每个残差块有 2 层卷积）
+# 10（第二阶段的 5 个残差块，每个残差块有 2 层卷积）
+# 10（第三阶段的 5 个残差块，每个残差块有 2 层卷积）
+# 1（全连接层）
+# 总层数 = 1 + 10 + 10 + 10 + 1 = 32 层
+# ResNet-32 的层数为 32 层，其中：
+# 1 层输入卷积层
+# 3 个阶段，每个阶段 5 个残差块，每个残差块由 2 层卷积构成，总共有 30 层卷积层
+# 1 层全连接层
+
+# 迁移学习是一种机器学习方法，它将一个任务上训练得到的知识应用到另一个相关任务上。通常情况下，迁移学习通过使用在大型数据集（如ImageNet）上预训练的模型，并将其应用于新的、数据较少的任务上，显著提高新任务的学习效果。迁移学习的基本步骤包括：
+# 选择预训练模型：在一个大规模数据集上训练得到的模型（如ResNet、VGG、Inception等），这些模型已经学会了有用的特征表示。
+# 冻结部分层：将预训练模型的底层（通常是特征提取层）冻结，这些层捕捉到了低层次的特征（如边缘、纹理等），不需要重新训练。
+# 微调：只训练模型的顶层（通常是分类层或全连接层），使其适应新任务的特定类别。
+# 为什么选择迁移学习：
+# 数据不足：迁移学习非常适合数据量较小的场景，因为预训练模型已经在大量数据上学习了有效的特征，可以有效地帮助新任务，即使新任务的数据较少。
+# 小样本问题：当目标任务的数据样本较少时，直接训练一个深度学习模型往往会导致过拟合。而迁移学习能够有效避免这一问题，因为预训练模型已经在大规模数据上学到了一些通用的特征。
+
+# 利用预训练模型特征提取：使用 residual_network 构建 ResNet 模型，适用于 CIFAR-10 数据集。
+# 全连接层输出被设为 10 类（CIFAR-10 分类任务）。
+
+# 微调模型：
+# 使用了学习率调度（scheduler）和 SGD 优化器结合 Nesterov 动量，能有效加速收敛。
+# 数据增强器 (setup_data_augmentation) 提供了水平翻转和位移变换。
+# 使用了 EarlyStopping 回调函数以防止过拟合。
+
+# 结果分析
+# 模型表现影响因素：
+# 数据规模：CIFAR-10 数据集较小，易过拟合。
+# 预训练模型选择：ResNet 架构更适合图像分类任务。
+#
+# 改进方向：
+# 增强数据：更多数据增强策略。
+# 调整超参数：进一步优化学习率、batch size。
+# 引入更深层的网络（如 ResNet-50 或 ResNet-101）。
+# 使用更多现代优化器（如 AdamW）试试较低学习率。
+# 数据增强策略可以增加更多变化，如随机旋转、对比度调整等。
 
 import os
 import numpy as np
@@ -32,6 +78,78 @@ import matplotlib.pyplot as plt
 from keras.preprocessing.image import ImageDataGenerator
 import time
 
+from sklearn.metrics import roc_curve, auc
+
+def plot_roc_curve(y_true, y_pred):
+    """
+    绘制ROC曲线。
+    """
+    plt.figure(figsize=(10, 8))
+
+    # 针对每一类分别绘制ROC曲线
+    for i in range(len(label_dict)):
+        fpr, tpr, _ = roc_curve(y_true[:, i], y_pred[:, i])
+        roc_auc = auc(fpr, tpr)
+        plt.plot(fpr, tpr, label=f'{label_dict[i]} (AUC = {roc_auc:.2f})')
+
+    # 绘制对角线
+    plt.plot([0, 1], [0, 1], 'k--', lw=2)
+    plt.xlim([0.0, 1.0])
+    plt.ylim([0.0, 1.05])
+    plt.xlabel('False Positive Rate')
+    plt.ylabel('True Positive Rate')
+    plt.title('ROC Curve')
+    plt.legend(loc="lower right")
+    plt.savefig('roc_curve.png')
+    plt.show()
+
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
+import seaborn as sns
+
+def plot_confusion_matrix(y_true, y_pred):
+    """
+    绘制混淆矩阵。
+    """
+    y_true_labels = np.argmax(y_true, axis=1)
+    y_pred_labels = np.argmax(y_pred, axis=1)
+
+    cm = confusion_matrix(y_true_labels, y_pred_labels)
+    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=list(label_dict.values()))
+
+    plt.figure(figsize=(10, 8))
+    disp.plot(cmap='Blues', ax=plt.gca())
+    plt.title("Confusion Matrix")
+    plt.savefig('confusion_matrix.png')
+    plt.show()
+
+
+# from keras.applications import ResNet50
+# from keras.layers import Flatten, Dense, GlobalAveragePooling2D
+# from keras.models import Model
+
+
+# # 加载预训练的 ResNet50 模型（不包含顶部的全连接层）
+# def create_pretrained_model(input_shape=(32, 32, 3), num_classes=10):
+#     # 加载 ResNet50 预训练模型，输入尺寸与 CIFAR-10 图像匹配
+#     base_model = ResNet50(weights='imagenet', include_top=False, input_shape=input_shape)
+#
+#     # 冻结底层卷积层，不训练这些层
+#     base_model.trainable = False
+#
+#     # 添加新的顶部结构，用于CIFAR-10分类
+#     x = base_model.output
+#     x = GlobalAveragePooling2D()(x)  # 使用全局平均池化
+#     x = Dense(1024, activation='relu')(x)  # 添加全连接层
+#     x = Dense(num_classes, activation='softmax')(x)  # 输出层，适配CIFAR-10
+#
+#     # 构建最终模型
+#     model = Model(inputs=base_model.input, outputs=x)
+#
+#     # 编译模型
+#     model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+#
+#     return model
+
 label_dict = {
     0: 'airplane',
     1: 'automobile',
@@ -45,7 +163,7 @@ label_dict = {
     9: 'truck'
 }
 
-# 1. 设置 TensorFlow 使用 GPU
+# 设置 TensorFlow 使用 GPU
 def setup_gpu():
     physical_devices = tf.config.list_physical_devices('GPU')
     if len(physical_devices) > 0:
@@ -55,7 +173,7 @@ def setup_gpu():
     else:
         print("No GPU found, running on CPU.")
 
-# 2. CIFAR-10 数据加载和预处理
+# CIFAR-10 数据加载和预处理
 def load_and_preprocess_cifar10(data_dir):
     """
     加载并预处理 CIFAR-10 数据集。
@@ -102,50 +220,75 @@ def load_and_preprocess_cifar10(data_dir):
     return (x_train, y_train), (x_test, y_test)
 
 
-# 3. 定义残差块
-def residual_block(x, o_filters, increase=False):
-    stride = (1, 1)
+# 定义残差块
+def residual_block(x, filters, stride=1, increase=False):
+    """
+    定义一个残差块。
+
+    参数：
+    x: 输入张量
+    filters: 输出卷积层的通道数
+    stride: 步幅
+    increase: 是否进行下采样
+
+    返回：
+    处理后的输出张量
+    """
+    shortcut = x
+
+    # 第一层卷积
+    x = Conv2D(filters, kernel_size=(3, 3), strides=stride, padding='same',
+               kernel_initializer="he_normal", kernel_regularizer=regularizers.l2(1e-4))(x)
+    x = BatchNormalization(momentum=0.9)(x)
+    x = Activation('relu')(x)
+
+    # 第二层卷积
+    x = Conv2D(filters, kernel_size=(3, 3), strides=1, padding='same',
+               kernel_initializer="he_normal", kernel_regularizer=regularizers.l2(1e-4))(x)
+    x = BatchNormalization(momentum=0.9)(x)
+
+    # 如果需要增加通道数，则进行下采样
     if increase:
-        stride = (2, 2)
+        shortcut = Conv2D(filters, kernel_size=(1, 1), strides=stride, padding='same',
+                          kernel_initializer="he_normal", kernel_regularizer=regularizers.l2(1e-4))(shortcut)
 
-    o1 = Activation('relu')(BatchNormalization(momentum=0.9, epsilon=1e-5)(x))
-    conv_1 = Conv2D(o_filters, kernel_size=(3, 3), strides=stride, padding='same',
-                    kernel_initializer="he_normal",
-                    kernel_regularizer=regularizers.l2(1e-4))(o1)
-    o2 = Activation('relu')(BatchNormalization(momentum=0.9, epsilon=1e-5)(conv_1))
-    conv_2 = Conv2D(o_filters, kernel_size=(3, 3), strides=(1, 1), padding='same',
-                    kernel_initializer="he_normal",
-                    kernel_regularizer=regularizers.l2(1e-4))(o2)
-    if increase:
-        projection = Conv2D(o_filters, kernel_size=(1, 1), strides=(2, 2), padding='same',
-                            kernel_initializer="he_normal",
-                            kernel_regularizer=regularizers.l2(1e-4))(o1)
-        block = add([conv_2, projection])
-    else:
-        block = add([conv_2, x])
-    return block
+    # 合并 shortcut 和卷积后的输出
+    x = add([x, shortcut])
+    x = Activation('relu')(x)
+
+    return x
 
 
-# 4. 定义残差网络结构
+# 定义残差网络结构
 def residual_network(img_input, classes_num=10, stack_n=5):
-    # input: 32x32x3, output: 32x32x16
-    x = Conv2D(filters=16, kernel_size=(3, 3), strides=(1, 1), padding='same',
-               kernel_initializer="he_normal",
-               kernel_regularizer=regularizers.l2(1e-4))(img_input)
+    """
+    构建 ResNet-32 网络结构。
 
-    # 添加多个残差块
+    参数：
+    img_input: 输入层
+    classes_num: 分类类别数
+    stack_n: 每个阶段堆叠的残差块数（5）
+
+    返回：
+    网络输出
+    """
+    # 第一层卷积
+    x = Conv2D(16, kernel_size=(3, 3), strides=(1, 1), padding='same',
+               kernel_initializer="he_normal", kernel_regularizer=regularizers.l2(1e-4))(img_input)
+
+    # 第一个阶段，堆叠 5 个残差块
     for _ in range(stack_n):
-        x = residual_block(x, 16, False)
+        x = residual_block(x, 16)
 
-    # input: 32x32x16, output: 16x16x32
-    x = residual_block(x, 32, True)
+    # 第二个阶段，增加通道数并下采样
+    x = residual_block(x, 32, stride=2, increase=True)
     for _ in range(1, stack_n):
-        x = residual_block(x, 32, False)
+        x = residual_block(x, 32)
 
-    # input: 16x16x32, output: 8x8x64
-    x = residual_block(x, 64, True)
+    # 第三个阶段，增加通道数并下采样
+    x = residual_block(x, 64, stride=2, increase=True)
     for _ in range(1, stack_n):
-        x = residual_block(x, 64, False)
+        x = residual_block(x, 64)
 
     # BatchNorm + ReLU + GlobalAveragePooling
     x = BatchNormalization(momentum=0.9, epsilon=1e-5)(x)
@@ -155,10 +298,11 @@ def residual_network(img_input, classes_num=10, stack_n=5):
     # Fully connected layer
     x = Dense(classes_num, activation='softmax', kernel_initializer="he_normal",
               kernel_regularizer=regularizers.l2(1e-4))(x)
+
     return x
 
 
-# 5. 定义训练过程中的学习率调度器
+# 定义训练过程中的学习率调度器
 def scheduler(epoch):
     if epoch < 81:
         return 0.1
@@ -167,7 +311,7 @@ def scheduler(epoch):
     return 0.001
 
 
-# 6. 可视化训练过程（Loss 和 Accuracy 图表）
+# 可视化训练过程（Loss 和 Accuracy 图表）
 def plot_training_history(history):
     # 创建一个大图，包含训练和测试图表
     fig, axes = plt.subplots(1, 2, figsize=(18, 6))
@@ -212,7 +356,7 @@ def plot_training_history(history):
     plt.show()
 
 
-# 7. 可视化图像和标签对比
+# 可视化图像和标签对比
 def plot_images_labels_prediction(images, labels, predictions, start_index, num_images=10):
     """
     可视化图像及其真实标签和预测标签
@@ -246,7 +390,7 @@ def plot_images_labels_prediction(images, labels, predictions, start_index, num_
     plt.show()
 
 
-# 8. 设置数据增强
+# 设置数据增强
 def setup_data_augmentation(x_train):
     datagen = ImageDataGenerator(horizontal_flip=True,
                                  width_shift_range=0.125,
@@ -255,8 +399,7 @@ def setup_data_augmentation(x_train):
     datagen.fit(x_train)
     return datagen
 
-
-# 9. 训练模型
+# 训练模型
 def train_model(model, datagen, x_train, y_train, x_test, y_test, epochs, callbacks):
     history = model.fit(datagen.flow(x_train, y_train, batch_size=128),
                         steps_per_epoch=len(x_train) // 128,
@@ -266,7 +409,7 @@ def train_model(model, datagen, x_train, y_train, x_test, y_test, epochs, callba
     return history
 
 
-# 10. 主函数
+# 主函数
 def main():
     # 设置 GPU
     setup_gpu()
@@ -320,9 +463,18 @@ def main():
     # 保存模型
     model.save('resnet_model.h5')
 
+    # subset_size = 25  # 选择部分数据
+
+    # 使用完整数据进行预测
     # 进行预测并可视化
-    predictions = model.predict(x_test[:25])
+    predictions = model.predict(x_test)
     plot_images_labels_prediction(x_test, y_test, predictions, start_index=0)
+
+    # 混淆矩阵
+    plot_confusion_matrix(y_test, predictions)
+
+    # ROC曲线
+    plot_roc_curve(y_test, predictions)
 
 
 if __name__ == '__main__':
