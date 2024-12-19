@@ -119,16 +119,15 @@
 # main(file_path)
 
 
-import pandas as pd
-import numpy as np
-from matplotlib.ticker import FuncFormatter
-from sklearn.preprocessing import MinMaxScaler
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import LSTM, Dense
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import mean_squared_error
-import matplotlib.pyplot as plt
 import time
+
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+from matplotlib.ticker import FuncFormatter, ScalarFormatter
+from sklearn.metrics import mean_squared_error
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import MinMaxScaler
 
 # 设置字体为支持中文的字体
 plt.rcParams['font.family'] = 'SimHei'  # 如果 SimHei 没有，尝试 'Microsoft YaHei'
@@ -192,6 +191,145 @@ def build_lstm_model(input_shape):
     return model
 
 
+from keras.layers import LSTM
+
+
+# 改进版本的LSTM
+def build_advanced_lstm_model(input_shape):
+    model = Sequential()  # 初始化一个顺序模型
+
+    # 双向LSTM层，捕获输入数据的双向依赖
+    model.add(Bidirectional(LSTM(units=64, return_sequences=True, input_shape=input_shape)))
+    model.add(Dropout(0.2))  # Dropout层，防止过拟合
+
+    # 第二层LSTM层
+    model.add(LSTM(units=64, return_sequences=True))  # 中间LSTM层
+    model.add(Dropout(0.2))  # Dropout层
+
+    # 第三层LSTM层
+    model.add(LSTM(units=32, return_sequences=False))  # 最后一层LSTM
+    model.add(Dropout(0.2))  # Dropout层
+
+    # 全连接层，增加模型的表现力
+    model.add(Dense(64, activation='relu'))  # 更大的全连接层
+    model.add(Dropout(0.3))  # Dropout层
+
+    # 输出层
+    model.add(Dense(1))  # 输出一个数值，作为预测值
+
+    # 使用Adam优化器
+    model.compile(optimizer=Adam(learning_rate=0.001), loss='mean_squared_error')
+    return model
+
+
+# 添加l2的层
+def build_advanced_lstm_model_l2(input_shape):
+    model = Sequential()
+
+    # 双向LSTM层
+    model.add(Bidirectional(LSTM(units=128, return_sequences=True, input_shape=input_shape)))
+    model.add(Dropout(0.3))  # Dropout层
+
+    model.add(LSTM(units=64, return_sequences=True))
+    model.add(Dropout(0.3))
+
+    model.add(LSTM(units=32, return_sequences=False))
+    model.add(Dropout(0.3))
+
+    # 全连接层并加上L2正则化
+    model.add(Dense(64, activation='relu'))
+    model.add(Dropout(0.4))  # Dropout层
+
+    model.add(Dense(1))  # 输出层
+    model.compile(optimizer=Adam(learning_rate=0.0001), loss='mean_squared_error')
+
+    return model
+
+
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Conv1D, MaxPooling1D, LSTM, Dense, Dropout, Bidirectional
+from tensorflow.keras.optimizers import Adam
+
+# 结合 Conv1D 和 LSTM 的模型架构
+def build_conv1d_lstm_model(input_shape):
+    model = Sequential()
+
+    # 添加 Conv1D 层，进行特征提取
+    model.add(Conv1D(filters=64, kernel_size=3, activation='relu', input_shape=input_shape))
+    model.add(MaxPooling1D(pool_size=2))  # 添加池化层，减少参数量
+
+    # 添加 Bidirectional LSTM 层，增强序列建模能力
+    model.add(Bidirectional(LSTM(units=128, return_sequences=True)))
+    model.add(Dropout(0.3))  # Dropout 防止过拟合
+
+    # 继续堆叠 LSTM 层
+    model.add(LSTM(units=64, return_sequences=True))
+    model.add(Dropout(0.3))
+
+    # 最后一个 LSTM 层
+    model.add(LSTM(units=32, return_sequences=False))
+    model.add(Dropout(0.3))
+
+    # 全连接层
+    model.add(Dense(64, activation='relu'))
+    model.add(Dropout(0.4))  # Dropout 防止过拟合
+
+    # 输出层
+    model.add(Dense(1))  # 预测结果
+
+    # 编译模型
+    model.compile(optimizer=Adam(learning_rate=0.0001), loss='mean_squared_error')
+
+    return model
+
+
+# 数据可视化（展示每个特征随时间的变化）
+def show_raw_visualization(data,feature_keys):
+    """
+    数据可视化
+    :param data: 数据字典，包含特征和时间戳数据
+    :return: None
+    """
+    time_data = data['date']
+    fig, axes = plt.subplots(nrows=4, ncols=2, figsize=(15, 15), dpi=80, facecolor="w", edgecolor="k")
+
+    titles = [
+        "WEIGHTED ILI",
+        "UNWEIGHTED ILI",
+        "AGE 0-4",
+        "AGE 5-24",
+        "ILITOTAL",
+        "NUM. OF PROVIDERS",
+        "OT"
+    ]
+
+    colors = ["blue", "orange", "green", "red", "purple", "brown", "pink"]
+
+    for i in range(len(feature_keys)):
+        key = feature_keys[i]
+        c = colors[i % len(colors)]
+        t_data = data[key]
+        t_data.index = time_data
+
+        ax = t_data.plot(ax=axes[i // 2, i % 2], color=c, title=f"{titles[i]} - {key}", rot=25)
+        ax.legend([titles[i]])
+
+        # 设置y轴格式，防止科学计数法
+        ax.yaxis.set_major_formatter(ScalarFormatter())  # 使用普通格式显示
+        ax.yaxis.get_major_formatter().set_scientific(False)  # 禁止使用科学计数法
+
+    plt.tight_layout()
+    plt.show()
+
+def plot_loss(history):
+    plt.plot(history.history['loss'], label='训练损失')
+    plt.plot(history.history['val_loss'], label='验证损失')
+    plt.title("训练与验证损失")
+    plt.xlabel("Epochs")
+    plt.ylabel("Loss")
+    plt.legend()
+    plt.show()
+
 # 主函数
 def main(file_path):
     # 预处理数据
@@ -200,6 +338,8 @@ def main(file_path):
     # 选择特征和目标列
     features = ['WEIGHTED_ILI', 'UNWEIGHTED_ILI', 'AGE_0-4', 'AGE_5-24', 'ILITOTAL', 'NUM._OF_PROVIDERS', 'OT']
     target = 'OT'
+
+    show_raw_visualization(data,features)
 
     # 标准化特征数据
     scaler = MinMaxScaler(feature_range=(0, 1))
@@ -211,21 +351,36 @@ def main(file_path):
     target_scaler.fit(target_data)
 
     # 设置时间步长（例如：使用前time_steps周的数据来预测下一个周的OT）
-    time_steps = 50
+    time_steps = 200
     X, y = create_dataset(pd.DataFrame(scaled_data, columns=features), features, target, time_steps)
 
     # 切分数据集为训练集和测试集
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle=False)
 
     # 构建LSTM模型
-    model = build_lstm_model(input_shape=(X_train.shape[1], X_train.shape[2]))
+    # model = build_lstm_model(input_shape=(X_train.shape[1], X_train.shape[2]))
+    # model = build_advanced_lstm_model(input_shape=(X_train.shape[1], X_train.shape[2]))
+
+    model = build_advanced_lstm_model_l2(input_shape=(X_train.shape[1], X_train.shape[2]))
+    # model = build_conv1d_lstm_model(input_shape=(X_train.shape[1], X_train.shape[2]))
+
+    # print(model.summary())
+
+    from keras.callbacks import ReduceLROnPlateau
+    # 定义学习率衰减
+    reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.5, patience=5, min_lr=0.00001)
 
     # 训练模型
     start_time = time.time()
-    model.fit(X_train, y_train, epochs=100, batch_size=64, validation_data=(X_test, y_test), verbose=1)
+    history = model.fit(X_train, y_train, epochs=100, batch_size=32, validation_data=(X_test, y_test), callbacks=[reduce_lr], verbose=1)
+
+    # history = model.fit(X_train, y_train, epochs=100, batch_size=32, validation_data=(X_test, y_test), verbose=1)
+
     training_time = time.time() - start_time
 
     print(f"模型训练时间: {training_time:.2f}秒")
+
+    plot_loss(history)
 
     # 预测结果
     y_pred = model.predict(X_test)
