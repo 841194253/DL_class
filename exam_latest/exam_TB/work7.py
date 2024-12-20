@@ -100,7 +100,7 @@ def plot_results(actual, predicted, dates, user_column):
     plt.show()
 
 # 主函数：组合整个流程
-def main(filepath, user_column='0', time_step=30, split_ratio=0.8, epochs=20, batch_size=32):
+def main(filepath, user_column='0', time_step=50, split_ratio=0.8, epochs=20, batch_size=32):
     """
     主函数，完成从数据加载到模型预测的完整流程。
     :param filepath: CSV文件路径
