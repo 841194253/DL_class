@@ -124,14 +124,18 @@ import time
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from matplotlib.ticker import FuncFormatter, ScalarFormatter
-from sklearn.metrics import mean_squared_error
+from keras.callbacks import EarlyStopping, ReduceLROnPlateau
+from keras.layers import TimeDistributed, RepeatVector, ConvLSTM2D
+from matplotlib.ticker import ScalarFormatter
+from sklearn.metrics import mean_squared_error, mean_absolute_error
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
+from tensorflow.keras.layers import LSTM, Dense, Dropout, Bidirectional, Conv1D, MaxPooling1D, Flatten
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.optimizers import Adam
 
 # 设置字体为支持中文的字体
 plt.rcParams['font.family'] = 'SimHei'  # 如果 SimHei 没有，尝试 'Microsoft YaHei'
-
 
 # 预处理函数：清理列名、标准化数据、准备特征和目标变量
 def preprocess_data(file_path):
@@ -182,109 +186,119 @@ def create_dataset(data, features, target, time_steps=1):
     return np.array(X), np.array(y)
 
 
-# 构建LSTM模型
-def build_lstm_model(input_shape):
+# 构建不同的LSTM模型
+def build_lstm_model(input_shape, n_outputs=1):
     model = Sequential()
-    model.add(LSTM(units=50, return_sequences=False, input_shape=input_shape))
-    model.add(Dense(1))
-    model.compile(optimizer='adam', loss='mean_squared_error',metrics=['mae'])
+    model.add(LSTM(units=200, return_sequences=False, input_shape=input_shape))
+    model.add(Dense(n_outputs))  # 输出层的神经元数目根据n_outputs决定
+    model.compile(optimizer='adam', loss='mean_squared_error', metrics=['mae', 'mape'])
+    print(model.summary())
     return model
 
 
-from keras.layers import LSTM
+def build_advanced_lstm_model(input_shape, n_outputs=1):
+    model = Sequential()
 
-
-# 改进版本的LSTM
-def build_advanced_lstm_model(input_shape):
-    model = Sequential()  # 初始化一个顺序模型
-
-    # 双向LSTM层，捕获输入数据的双向依赖
     model.add(Bidirectional(LSTM(units=64, return_sequences=True, input_shape=input_shape)))
-    model.add(Dropout(0.2))  # Dropout层，防止过拟合
-
-    # 第二层LSTM层
-    model.add(LSTM(units=64, return_sequences=True))  # 中间LSTM层
-    model.add(Dropout(0.2))  # Dropout层
-
-    # 第三层LSTM层
-    model.add(LSTM(units=32, return_sequences=False))  # 最后一层LSTM
-    model.add(Dropout(0.2))  # Dropout层
-
-    # 全连接层，增加模型的表现力
-    model.add(Dense(64, activation='relu'))  # 更大的全连接层
-    model.add(Dropout(0.3))  # Dropout层
-
-    # 输出层
-    model.add(Dense(1))  # 输出一个数值，作为预测值
-
-    # 使用Adam优化器
-    model.compile(optimizer=Adam(learning_rate=0.001), loss='mean_squared_error',metrics=['mae'])
-    return model
-
-
-# 添加l2的层
-def build_advanced_lstm_model_l2(input_shape):
-    model = Sequential()
-
-    # 双向LSTM层
-    model.add(Bidirectional(LSTM(units=128, return_sequences=True, input_shape=input_shape)))
-    model.add(Dropout(0.3))  # Dropout层
+    model.add(Dropout(0.2))
 
     model.add(LSTM(units=64, return_sequences=True))
-    model.add(Dropout(0.3))
+    model.add(Dropout(0.2))
 
     model.add(LSTM(units=32, return_sequences=False))
+    model.add(Dropout(0.2))
+
+    model.add(Dense(64, activation='relu'))
     model.add(Dropout(0.3))
 
-    # 全连接层并加上L2正则化
-    model.add(Dense(64, activation='relu'))
-    model.add(Dropout(0.4))  # Dropout层
-
-    model.add(Dense(1))  # 输出层
-    model.compile(optimizer=Adam(learning_rate=0.0001), loss='mean_squared_error',metrics=['mae'])
-
+    model.add(Dense(n_outputs))  # 输出层根据n_outputs动态调整
+    model.compile(optimizer=Adam(learning_rate=0.001), loss='mean_squared_error', metrics=['mae', 'mape'])
+    model.build(input_shape=(None, input_shape[0], input_shape[1]))
+    print(model.summary())
     return model
 
 
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Conv1D, MaxPooling1D, LSTM, Dense, Dropout, Bidirectional
-from tensorflow.keras.optimizers import Adam
-
-# 结合 Conv1D 和 LSTM 的模型架构
-def build_conv1d_lstm_model(input_shape):
+def build_conv1d_lstm_model(input_shape, n_outputs=1):
     model = Sequential()
 
-    # 添加 Conv1D 层，进行特征提取
     model.add(Conv1D(filters=64, kernel_size=3, activation='relu', input_shape=input_shape))
-    model.add(MaxPooling1D(pool_size=2))  # 添加池化层，减少参数量
+    model.add(MaxPooling1D(pool_size=2))
 
-    # 添加 Bidirectional LSTM 层，增强序列建模能力
     model.add(Bidirectional(LSTM(units=128, return_sequences=True)))
-    model.add(Dropout(0.3))  # Dropout 防止过拟合
+    model.add(Dropout(0.3))
 
-    # 继续堆叠 LSTM 层
     model.add(LSTM(units=64, return_sequences=True))
     model.add(Dropout(0.3))
 
-    # 最后一个 LSTM 层
     model.add(LSTM(units=32, return_sequences=False))
     model.add(Dropout(0.3))
 
-    # 全连接层
     model.add(Dense(64, activation='relu'))
-    model.add(Dropout(0.4))  # Dropout 防止过拟合
+    model.add(Dropout(0.4))
 
-    # 输出层
-    model.add(Dense(1))  # 预测结果
+    model.add(Dense(n_outputs))  # 输出层根据n_outputs动态调整
+
+    model.compile(optimizer=Adam(learning_rate=0.0001), loss='mean_squared_error', metrics=['mae', 'mape'])
+    print(model.summary())
+
+    return model
+
+
+def conv_lstm_ConvLSTM2D_model(input_shape, n_outputs=1):
+    """
+    构建一个基于ConvLSTM的神经网络模型，适用于时间序列预测任务。
+
+    :param input_shape: 输入数据的形状，(时间步数, 特征维度, 通道数)
+    :param n_outputs: 输出的时间步数
+
+    :return: 编译后的模型
+    """
+    # 构建模型
+    model = Sequential()
+
+    # ConvLSTM2D层：处理时间序列数据并提取时空特征
+    model.add(ConvLSTM2D(filters=64, kernel_size=(1, 3), activation='relu',
+                         input_shape=input_shape))
+
+    # Flatten层：将多维输出展平为一维
+    model.add(Flatten())
+
+    # RepeatVector层：将输入重复n_outputs次，以便输出多个时间步
+    model.add(RepeatVector(n_outputs))
+
+    # LSTM层：学习时间序列的动态特征
+    model.add(LSTM(200, activation='relu', return_sequences=True))
+
+    # TimeDistributed层：应用Dense层到每一个时间步
+    model.add(TimeDistributed(Dense(100, activation='relu')))
+
+    # TimeDistributed层：输出每个时间步的预测
+    model.add(TimeDistributed(Dense(1)))
 
     # 编译模型
-    model.compile(optimizer=Adam(learning_rate=0.0001), loss='mean_squared_error',metrics=['mae'])
+    model.compile(loss='mse', optimizer=Adam(learning_rate=0.0001), metrics=['mae'])
+
+    # 打印模型概况
+    print(model.summary())
 
     return model
+
+# 选择并构建模型
+def select_model(model_type, input_shape, n_outputs=1):
+    if model_type == 'lstm':
+        return build_lstm_model(input_shape, n_outputs)
+    elif model_type == 'advanced_lstm':
+        return build_advanced_lstm_model(input_shape, n_outputs)
+    elif model_type == 'conv1d_lstm':
+        return build_conv1d_lstm_model(input_shape, n_outputs)
+    elif model_type == 'conv2d_lstm':
+        return conv_lstm_ConvLSTM2D_model(input_shape, n_outputs)
+    else:
+        raise ValueError(f"未识别的模型类型: {model_type}")
 
 
 # 数据可视化（展示每个特征随时间的变化）
-def show_raw_visualization(data,feature_keys):
+def show_raw_visualization(data, feature_keys):
     """
     数据可视化
     :param data: 数据字典，包含特征和时间戳数据
@@ -321,25 +335,19 @@ def show_raw_visualization(data,feature_keys):
     plt.tight_layout()
     plt.show()
 
-def plot_loss(history):
-    plt.plot(history.history['loss'], label='训练损失')
-    plt.plot(history.history['val_loss'], label='验证损失')
-    plt.title("训练与验证损失")
-    plt.xlabel("Epochs")
-    plt.ylabel("Loss")
-    plt.legend()
-    plt.show()
 
 # 主函数
-def main(file_path):
+def main(file_path, model_type='lstm'):
     # 预处理数据
     data = preprocess_data(file_path)
+
+    data['date'] = pd.to_datetime(data['date'])
 
     # 选择特征和目标列
     features = ['WEIGHTED_ILI', 'UNWEIGHTED_ILI', 'AGE_0-4', 'AGE_5-24', 'ILITOTAL', 'NUM._OF_PROVIDERS', 'OT']
     target = 'OT'
 
-    show_raw_visualization(data,features)
+    show_raw_visualization(data, features)
 
     # 标准化特征数据
     scaler = MinMaxScaler(feature_range=(0, 1))
@@ -357,69 +365,72 @@ def main(file_path):
     # 切分数据集为训练集和测试集
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle=False)
 
-    # 构建LSTM模型
-    model = build_lstm_model(input_shape=(X_train.shape[1], X_train.shape[2]))
-    # model = build_advanced_lstm_model(input_shape=(X_train.shape[1], X_train.shape[2]))
+    # 动态选择并构建模型
+    model = select_model(model_type=model_type, input_shape=(X_train.shape[1], X_train.shape[2]), n_outputs=1)
 
-    # model = build_advanced_lstm_model_l2(input_shape=(X_train.shape[1], X_train.shape[2]))
-    # model = build_conv1d_lstm_model(input_shape=(X_train.shape[1], X_train.shape[2]))
-
-    # print(model.summary())
-
-    from keras.callbacks import ReduceLROnPlateau
     # 定义学习率衰减
     reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.5, patience=5, min_lr=0.00001)
+    early_stopping = EarlyStopping(monitor='val_loss', patience=5, restore_best_weights=True)
 
     # 训练模型
     start_time = time.time()
-    history = model.fit(X_train, y_train, epochs=100, batch_size=32, validation_data=(X_test, y_test), callbacks=[reduce_lr], verbose=1)
-
-    # history = model.fit(X_train, y_train, epochs=100, batch_size=32, validation_data=(X_test, y_test), verbose=1)
+    history = model.fit(X_train, y_train, epochs=100, batch_size=32, validation_data=(X_test, y_test), callbacks=[reduce_lr, early_stopping], verbose=1)
 
     training_time = time.time() - start_time
-
     print(f"模型训练时间: {training_time:.2f}秒")
 
-    plot_loss(history)
+    # 绘制损失曲线
+    plt.plot(history.history['loss'], label='训练损失')
+    plt.plot(history.history['val_loss'], label='验证损失')
+    plt.title("训练与验证损失")
+    plt.xlabel('Epochs')
+    plt.ylabel('Loss')
+    plt.legend()
+    plt.show()
 
     # 预测结果
     y_pred = model.predict(X_test)
 
-    # 反归一化预测值
+    # 反归一化结果
     y_pred_rescaled = target_scaler.inverse_transform(y_pred)
+    y_test_rescaled = target_scaler.inverse_transform(y_test.reshape(-1, 1))
 
-    # 反归一化真实值
-    y_test_rescaled = target_scaler.inverse_transform(y_test.reshape(-1, 1))  # reshape为列向量
 
-    # 计算均方误差
-    mse = mean_squared_error(y_test, y_pred)
-    print(f"均方误差 (MSE): {mse}")
-    from sklearn.metrics import mean_absolute_error
+    # 计算MSE和MAE
+    mse = mean_squared_error(y_test, y_pred)  # y_test 和 y_pred 是归一化后的数据
     mae = mean_absolute_error(y_test, y_pred)
-    print(f"绝对误差(MAE): {mae}")
 
-    # 可视化反归一化后的结果
-    plt.figure(figsize=(12, 6))
-    # plt.plot(y_test_rescaled, color='blue', label='真实患者人数')  # 使用反归一化后的真实值
-    # plt.plot(y_pred_rescaled, color='red', label='预测患者人数')  # 使用反归一化后的预测值
-    # 使用data['date']作为时间轴
-    plt.plot(data['date'].iloc[-len(y_test_rescaled):], y_test_rescaled, color='blue',label='真实患者人数')  # 使用反归一化后的真实值
-    plt.plot(data['date'].iloc[-len(y_pred_rescaled):], y_pred_rescaled, color='red',label='预测患者人数')  # 使用反归一化后的预测值
+    print(f"MSE: {mse:.7f}")
+    print(f"MAE: {mae:.7f}")
 
-    plt.title('患者人数的预测结果（反归一化）')
-    plt.xlabel('时间')
-    plt.ylabel('患者人数')
-    plt.legend()
-    plt.xticks(rotation=45)  # 旋转x轴标签以提高可读性
-    # 设置Y轴格式为正常数字，去掉科学计数法
-    plt.gca().yaxis.set_major_formatter(FuncFormatter(lambda x, _: f'{x:,.0f}'))
+    # 创建一个新的 DataFrame 用于保存预测结果
+    prediction_df = pd.DataFrame({
+        'y_test_rescaled': y_test_rescaled.flatten(),
+        'y_pred_rescaled': y_pred_rescaled.flatten()
+    })
 
+    # 提取测试集日期
+    test_dates = data['date'].iloc[-len(y_test_rescaled):]
+
+    # 绘制预测结果
+    plt.plot(test_dates, y_test_rescaled, label='真实值', color='blue')
+    plt.plot(test_dates, y_pred_rescaled, label='预测值', color='red')
+
+    # 设置y轴格式，去除科学计数法
+    plt.gca().yaxis.set_major_formatter(ScalarFormatter())  # 使用普通格式显示
+    plt.gca().yaxis.get_major_formatter().set_scientific(False)  # 禁止使用科学计数法
+    # plt.legend()
+    plt.grid(True)  # 添加网格线，增加可读性
+    # 自动旋转日期标签，避免重叠
+    plt.gcf().autofmt_xdate()
+    plt.title('真实值与预测值')
     plt.show()
 
 
-# 执行主函数
-file_path = '../dataset/illness/national_illness.csv'  # 数据文件路径
-main(file_path)
+if __name__ == '__main__':
+    file_path = '../dataset/illness/national_illness.csv'
+    model_type = 'lstm'  # 可以选择 'lstm', 'advanced_lstm', 或 'conv1d_lstm' conv2d_lstm
+    main(file_path, model_type=model_type)
 
 # 模型优缺点分析：
 # 优点：
