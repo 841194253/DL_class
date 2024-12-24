@@ -30,15 +30,14 @@
 
 import os
 import pickle
-import numpy as np
-from tensorflow.keras.utils import to_categorical
-from tensorflow.keras.preprocessing.image import ImageDataGenerator
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Flatten, Dense, Dropout
-from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
+
 from sklearn.metrics import confusion_matrix, roc_curve, auc
-import matplotlib.pyplot as plt
 from sklearn.preprocessing import label_binarize
+from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
+from tensorflow.keras.layers import Flatten, Dense, Dropout
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from tensorflow.keras.utils import to_categorical
 
 # CIFAR-10 标签映射字典
 label_dict = {
@@ -157,6 +156,8 @@ def plot_confusion_matrix(cm, num_classes=10, save_path='confusion_matrix.png'):
             plt.text(j, i, format(cm[i, j], 'd'),
                      ha="center", va="center", color="white" if cm[i, j] > thresh else "black")
     plt.tight_layout()
+    # 自动旋转日期标签，避免重叠
+    plt.gcf().autofmt_xdate()
     plt.savefig(save_path)
     plt.show()
 
@@ -204,14 +205,8 @@ def plot_training_history(history, model, x_test, y_test):
     plt.savefig('train.png')
     plt.show()
 
-    # 获取每个 epoch 后的测试集损失和准确率
-    test_losses = []
-    test_accuracies = []
-
-    for epoch in range(len(history.history['loss'])):
-        test_loss, test_acc = model.evaluate(x_test, y_test, verbose=0)
-        test_losses.append(test_loss)
-        test_accuracies.append(test_acc)
+    test_losses = history.history['val_loss']
+    test_accuracies = history.history['val_accuracy']
 
     # 测试 Loss 和 Accuracy 图表（右图）
     fig, axes = plt.subplots(1, 2, figsize=(18, 6))
@@ -276,12 +271,18 @@ def main():
     # 构建VGG16模型
     model = build_vgg16_model(input_shape=(32, 32, 3), num_classes=10)
 
+    # 打印测试集形状
+    print(f"x_test shape: {x_test.shape}, y_test shape: {y_test.shape}")
+
     # 训练模型
     history = train_model(model, datagen, x_train, y_train, x_test, y_test)
 
+    for epoch, (loss, acc) in enumerate(zip(history.history['val_loss'], history.history['val_accuracy'])):
+        print(f"Epoch {epoch + 1}: Test Loss = {loss}, Test Accuracy = {acc}")
+
     # 评估模型
     test_loss, test_acc = evaluate_model(model, x_test, y_test)
-
+    print(f"Test Loss = {test_loss}, Test Accuracy = {test_acc}")
     # 绘制训练过程（Loss 和 Accuracy 图表）
     plot_training_history(history, model, x_test, y_test)
 

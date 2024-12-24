@@ -43,15 +43,16 @@
 # 优化器调整：可以尝试使用其他优化器（如 Adam 或 RMSprop），以提高模型的收敛速度和准确度。
 import os
 import pickle
-import numpy as np
-from tensorflow.keras.utils import to_categorical
-from tensorflow.keras.preprocessing.image import ImageDataGenerator
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Flatten, Dense, Dropout
-from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
-from sklearn.metrics import confusion_matrix, roc_curve, auc
+
 import matplotlib.pyplot as plt
+import numpy as np
+from sklearn.metrics import confusion_matrix, roc_curve, auc
 from sklearn.preprocessing import label_binarize
+from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
+from tensorflow.keras.layers import Flatten, Dense, Dropout
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from tensorflow.keras.utils import to_categorical
 
 # CIFAR-10 标签映射字典
 label_dict = {
@@ -222,14 +223,8 @@ def plot_training_history(history, model, x_test, y_test):
     plt.savefig('train.png')
     plt.show()
 
-    # 获取每个 epoch 后的测试集损失和准确率
-    test_losses = []
-    test_accuracies = []
-
-    for epoch in range(len(history.history['loss'])):
-        test_loss, test_acc = model.evaluate(x_test, y_test, verbose=0)
-        test_losses.append(test_loss)
-        test_accuracies.append(test_acc)
+    test_losses = history.history['val_loss']
+    test_accuracies = history.history['val_accuracy']
 
     # 测试 Loss 和 Accuracy 图表（右图）
     fig, axes = plt.subplots(1, 2, figsize=(18, 6))
