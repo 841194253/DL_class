@@ -370,7 +370,7 @@ def main(file_path, model_type='lstm'):
 
     # 定义学习率衰减
     reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.5, patience=5, min_lr=0.00001)
-    early_stopping = EarlyStopping(monitor='val_loss', patience=5, restore_best_weights=True)
+    early_stopping = EarlyStopping(monitor='val_loss', patience=20, restore_best_weights=True)
 
     # 训练模型
     start_time = time.time()
@@ -413,17 +413,20 @@ def main(file_path, model_type='lstm'):
     test_dates = data['date'].iloc[-len(y_test_rescaled):]
 
     # 绘制预测结果
-    plt.plot(test_dates, y_test_rescaled, label='真实值', color='blue')
-    plt.plot(test_dates, y_pred_rescaled, label='预测值', color='red')
+    plt.plot(test_dates, y_test_rescaled, label='真实值', color='blue', linewidth=2)
+    plt.plot(test_dates, y_pred_rescaled, label='预测值', color='red',  linewidth=2)
 
     # 设置y轴格式，去除科学计数法
     plt.gca().yaxis.set_major_formatter(ScalarFormatter())  # 使用普通格式显示
     plt.gca().yaxis.get_major_formatter().set_scientific(False)  # 禁止使用科学计数法
-    # plt.legend()
+    plt.legend()
+
     plt.grid(True)  # 添加网格线，增加可读性
-    # 自动旋转日期标签，避免重叠
+    # 自动旋转标签，避免重叠
     plt.gcf().autofmt_xdate()
     plt.title('真实值与预测值')
+    plt.xlabel('时间')
+    plt.ylabel('患者数量')
     plt.show()
 
 

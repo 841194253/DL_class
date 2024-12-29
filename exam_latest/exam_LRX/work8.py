@@ -64,21 +64,21 @@
 # 数据增强策略可以增加更多变化，如随机旋转、对比度调整等。
 
 import os
-import numpy as np
 import pickle
-import keras
-from keras import optimizers
-from keras.layers import Conv2D, Dense, Input, BatchNormalization, Activation, add, GlobalAveragePooling2D
-from keras.models import Model
-from keras.callbacks import LearningRateScheduler, TensorBoard, EarlyStopping, Callback
-from keras.utils import to_categorical
-from keras import regularizers
-import tensorflow as tf
-import matplotlib.pyplot as plt
-from keras.preprocessing.image import ImageDataGenerator
 import time
 
+import matplotlib.pyplot as plt
+import numpy as np
+import tensorflow as tf
+from keras import optimizers
+from keras import regularizers
+from keras.callbacks import LearningRateScheduler, TensorBoard, EarlyStopping
+from keras.layers import Conv2D, Dense, Input, BatchNormalization, Activation, add, GlobalAveragePooling2D
+from keras.models import Model
+from keras.preprocessing.image import ImageDataGenerator
+from keras.utils import to_categorical
 from sklearn.metrics import roc_curve, auc
+
 
 def plot_roc_curve(y_true, y_pred):
     """
@@ -104,7 +104,7 @@ def plot_roc_curve(y_true, y_pred):
     plt.show()
 
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
-import seaborn as sns
+
 
 def plot_confusion_matrix(y_true, y_pred):
     """
@@ -118,6 +118,7 @@ def plot_confusion_matrix(y_true, y_pred):
 
     plt.figure(figsize=(10, 8))
     disp.plot(cmap='Blues', ax=plt.gca())
+    plt.gcf().autofmt_xdate()
     plt.title("Confusion Matrix")
     plt.savefig('confusion_matrix.png')
     plt.show()
@@ -413,6 +414,7 @@ def train_model(model, datagen, x_train, y_train, x_test, y_test, epochs, callba
 def main():
     # 设置 GPU
     setup_gpu()
+    print(tf.__version__)
 
     # 加载和预处理 CIFAR-10 数据
     data_dir = '../../images/CIFAR-10/'  # CIFAR-10 数据集路径
@@ -425,12 +427,16 @@ def main():
 
     # 编译模型
     sgd = optimizers.SGD(learning_rate=0.01, momentum=0.9, nesterov=True)
-    model.compile(loss='categorical_crossentropy', optimizer=sgd, metrics=['accuracy'])
+    adam = optimizers.Adam(learning_rate=0.001, beta_1=0.9, beta_2=0.999)
+    import tensorflow_addons as tfa
+    adamw = tfa.optimizers.AdamW(learning_rate=0.001, beta_1=0.9, beta_2=0.999, weight_decay=0.01)
+    # from keras_adamw import AdamW # 属于keras3的代码 现在已经不在支持
+    # adamw1 = AdamW(learning_rate=0.001, beta_1=0.9, beta_2=0.999, weight_decay=0.004)
+    model.compile(loss='categorical_crossentropy', optimizer=adam, metrics=['accuracy'])
 
     # 设置回调函数
     tb_cb = TensorBoard(log_dir='./logs', histogram_freq=0)
     change_learning_rate = LearningRateScheduler(scheduler)
-    cbks = [change_learning_rate, tb_cb]
 
     # 数据增强
     datagen = setup_data_augmentation(x_train)
@@ -443,7 +449,10 @@ def main():
         restore_best_weights=True  # 恢复到最好的权重
     )
 
-    callbacks = [early_stopping, change_learning_rate, tb_cb, cbks]
+    # callbacks = [early_stopping, change_learning_rate, tb_cb]
+    callbacks = [early_stopping, tb_cb]
+
+    model.summary()
 
     # 记录训练的开始时间
     start_time = time.time()
