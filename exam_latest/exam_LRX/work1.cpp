@@ -40,10 +40,10 @@ int main() {
     // 计算图像的分辨率与实际宽度的比例
     double image_width_in_cm = 20.0;  // 槽的实际宽度为20厘米
     int image_width_in_pixels = image.cols;
-    double pixel_to_cm_ratio = image_width_in_cm / image_width_in_pixels;
+    double pixel_to_cm_ratio = image_width_in_cm / image_width_in_pixels; //计算每个像素对应的厘米数
 
     // 将绿色像素数转换为平方厘米面积
-    double green_area_cm2 = green_pixels * (pixel_to_cm_ratio * pixel_to_cm_ratio);
+    double green_area_cm2 = green_pixels * (pixel_to_cm_ratio * pixel_to_cm_ratio); //绿色像素的数量乘以每个像素的实际面积
 
     std::cout << "Green area " << green_area_cm2 << std::endl;
 

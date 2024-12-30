@@ -307,9 +307,10 @@ def residual_network(img_input, classes_num=10, stack_n=5):
 def scheduler(epoch):
     if epoch < 81:
         return 0.1
-    elif epoch < 122:
+    if epoch < 122:
         return 0.01
     return 0.001
+
 
 
 # 可视化训练过程（Loss 和 Accuracy 图表）
@@ -317,7 +318,7 @@ def plot_training_history(history):
     # 创建一个大图，包含训练和测试图表
     fig, axes = plt.subplots(1, 2, figsize=(18, 6))
 
-    # 训练 Loss 和 Accuracy 图表（左图）
+    # 训练 Loss 和 Accuracy 图表
     axes[0].plot(history.history['loss'], label='Training Loss')
     axes[0].plot(history.history['val_loss'], label='Validation Loss')
     axes[0].set_title('Training Loss and Validation Loss')
@@ -339,7 +340,7 @@ def plot_training_history(history):
     # 创建一个新的图像，只包含测试图表
     fig, axes = plt.subplots(1, 2, figsize=(18, 6))
 
-    # 测试 Loss 和 Accuracy 图表（左图）
+    # 测试 Loss 和 Accuracy 图表
     axes[0].plot(history.history['val_loss'], label='Test Loss')
     axes[0].set_title('Test Loss')
     axes[0].set_xlabel('Epochs')
@@ -450,7 +451,8 @@ def main():
     )
 
     # callbacks = [early_stopping, change_learning_rate, tb_cb]
-    callbacks = [early_stopping, tb_cb]
+    # callbacks = [early_stopping, tb_cb]
+    callbacks = [tb_cb]
 
     model.summary()
 
@@ -458,7 +460,7 @@ def main():
     start_time = time.time()
 
     # 训练模型
-    epochs = 50
+    epochs = 200
     history = train_model(model, datagen, x_train, y_train, x_test, y_test, epochs, callbacks)
 
     # 记录训练的结束时间
