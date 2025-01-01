@@ -418,7 +418,7 @@ def main():
     print(tf.__version__)
 
     # 加载和预处理 CIFAR-10 数据
-    data_dir = '../../images/CIFAR-10/'  # CIFAR-10 数据集路径
+    data_dir = '../../../images/CIFAR-10/'  # CIFAR-10 数据集路径
     (x_train, y_train), (x_test, y_test) = load_and_preprocess_cifar10(data_dir)
 
     # 定义输入和模型

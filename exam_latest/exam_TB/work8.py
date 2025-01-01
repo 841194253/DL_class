@@ -145,7 +145,7 @@ def train_model(model, datagen, x_train, y_train, x_test, y_test):
 
     history = model.fit(
         datagen.flow(x_train, y_train, batch_size=128),
-        epochs=3,
+        epochs=50,
         validation_data=(x_test, y_test),
         callbacks=[early_stop, checkpoint]
     )

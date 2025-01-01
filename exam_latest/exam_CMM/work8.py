@@ -125,7 +125,7 @@ def train_model(model, datagen, x_train, y_train, x_test, y_test):
 
     history = model.fit(
         datagen.flow(x_train, y_train, batch_size=128),
-        epochs=3,
+        epochs=50,
         validation_data=(x_test, y_test),
         callbacks=[early_stop, checkpoint]
     )
@@ -270,6 +270,8 @@ def main():
 
     # 构建VGG16模型
     model = build_vgg16_model(input_shape=(32, 32, 3), num_classes=10)
+
+    model.summary()
 
     # 打印测试集形状
     print(f"x_test shape: {x_test.shape}, y_test shape: {y_test.shape}")

@@ -333,6 +333,7 @@ def show_raw_visualization(data, feature_keys):
         ax.yaxis.get_major_formatter().set_scientific(False)  # 禁止使用科学计数法
 
     plt.tight_layout()
+    plt.savefig('data.png')
     plt.show()
 
 
@@ -375,7 +376,7 @@ def main(file_path, model_type='lstm'):
     # 训练模型
     start_time = time.time()
     history = model.fit(X_train, y_train, epochs=100, batch_size=32, validation_data=(X_test, y_test), callbacks=[reduce_lr, early_stopping], verbose=1)
-
+    # history = model.fit(X_train, y_train, epochs=100, batch_size=32, validation_data=(X_test, y_test),callbacks=[reduce_lr], verbose=1)
     training_time = time.time() - start_time
     print(f"模型训练时间: {training_time:.2f}秒")
 
@@ -386,6 +387,7 @@ def main(file_path, model_type='lstm'):
     plt.xlabel('Epochs')
     plt.ylabel('Loss')
     plt.legend()
+    plt.savefig('loss.png')
     plt.show()
 
     # 预测结果
@@ -427,11 +429,12 @@ def main(file_path, model_type='lstm'):
     plt.title('真实值与预测值')
     plt.xlabel('时间')
     plt.ylabel('患者数量')
+    plt.savefig('predictions_true.png')
     plt.show()
 
 
 if __name__ == '__main__':
-    file_path = '../dataset/illness/national_illness.csv'
+    file_path = '../../dataset/illness/national_illness.csv'
     model_type = 'lstm'  # 可以选择 'lstm', 'advanced_lstm', 或 'conv1d_lstm' conv2d_lstm
     main(file_path, model_type=model_type)
 
